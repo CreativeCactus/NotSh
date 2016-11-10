@@ -77,7 +77,7 @@ Enter KILL to close this connection, or MSG to send:
             
              _,err := conn.Read(buffer[:])
             for err==nil {
-                execute(buffer,&conn,&quit)
+                execute(buffer,&conn,quit)
                 buffer = make([]byte,1024)
                  _,err = conn.Read(buffer[:])
             }
@@ -96,7 +96,7 @@ func grid() string {
 }
 
 
-func execute (buffer []byte, conn *net.Conn, quit *chan int) {
+func execute (buffer []byte, conn *net.Conn, quit chan int) {
     tbuff:=bytes.Trim(buffer, "\x00")
     cmd:=strings.Replace(string(tbuff),"\n","",-1)
     switch (cmd){
@@ -110,8 +110,9 @@ func execute (buffer []byte, conn *net.Conn, quit *chan int) {
             print(msg,"\n")
             (*conn).Write([]byte(fmt.Sprintf("Displayed: %s\n",msg)))
         case "KILL", "Kill", "kill":
-            *quit<-1
-            (*conn).Write([]byte(fmt.Sprintf("Connection killed.")))
+            quit<-1
+            (*conn).Write([]byte(fmt.Sprintf("Connection killed.\n")))
+        case "":
         default:
             (*conn).Write([]byte(fmt.Sprintf("Unknown instruction: %s",cmd)))
     }
