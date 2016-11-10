@@ -2,7 +2,6 @@ package main
 
 import (
     "os"
-    "os/exec"
     "fmt"
     "net"
     "log"
@@ -28,7 +27,7 @@ func main () {
     if _, er := os.Stat(logfile); os.IsNotExist(er) {
         f, err = os.Create(logfile)   
     } else {
-        f, err = os.Open(logfile)
+        f, err = os.OpenFile(logfile, os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
     }
     if err!=nil{
         panic(err)
@@ -89,7 +88,7 @@ Enter KILL to close this connection, or MSG to send:
 
 func grid() string {
 	//out, err := exec.Command("uuidgen").Output()
-    return string(time.Now().UnixNano())
+    return fmt.Sprintf("%d",time.Now().UnixNano())
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
